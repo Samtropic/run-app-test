@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RunSessionsService } from './run-sessions.service';
 import { CreateRunSessionDto } from './dto/create-run-session.dto';
 import { UpdateRunSessionDto } from './dto/update-run-session.dto';
@@ -23,7 +31,10 @@ export class RunSessionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRunSessionDto: UpdateRunSessionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateRunSessionDto: UpdateRunSessionDto,
+  ) {
     return this.runSessionsService.update(+id, updateRunSessionDto);
   }
 
