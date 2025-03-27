@@ -25,7 +25,7 @@ export class ExcludePasswordInterceptor implements NestInterceptor {
       if (Array.isArray(data)) {
         // Handle arrays recursively
         return data.map((item) => this.excludePassword(item));
-      } else {
+      } else if (!(data instanceof Date)) {
         // Handle objects recursively
         const newData = { ...data };
         for (const key in newData) {
