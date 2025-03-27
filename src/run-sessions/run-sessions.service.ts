@@ -35,26 +35,44 @@ export class RunSessionsService {
           'You cannot create session without an authenticated user',
         );
       }
-      console.log('Before compute', createRunSessionDto);
       const { distance, duration } = createRunSessionDto;
       // Average speed computing (km/h)
       const averageSpeed = distance / 1000 / (duration / 3600);
       // Average pace computing (secondes/km)
       const averagePace = Math.round(duration / (distance / 1000));
 
-      console.log('After compute', createRunSessionDto);
       const runSession = this.runSessionsRepository.create({
         ...createRunSessionDto,
         averageSpeed,
         averagePace,
         user,
       });
-      console.log('After creation', createRunSessionDto);
       return this.runSessionsRepository.save(runSession);
     } catch (error) {
+      // TODO: Use a logger instead
       console.error('Caught an error while creating an user:', error);
       throw new BadRequestException('Failed to process user creation request');
     }
+  }
+
+  async findByUserId(userId: string) {
+    const extractedNumber = userId.match(/^\d+$/)?.[0];
+    const parsedId = extractedNumber ? parseInt(extractedNumber, 10) : NaN;
+
+    if (isNaN(parsedId) || parsedId < 1) {
+      throw new BadRequestException('Invalid ID: Must be a positive integer');
+    }
+    const user = await this.usersRepository.findOne({
+      where: { id: parsedId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.runSessionsRepository.find({
+      where: { user: { id: parsedId } },
+      relations: ['user'],
+    });
   }
 
   async findAllOwned(user: ActiveUserData): Promise<RunSession[]> {
